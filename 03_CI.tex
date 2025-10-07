@@ -1,0 +1,314 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Going CI}
+{   
+	\usebackgroundtemplate{
+		\vbox to \paperheight{\vfil\hbox to \paperwidth{\hfil\includegraphics[height=\paperheight]{pipe.png}\hfil}\vfil}
+		%https://www.flaticon.com/free-icon/decoration_2788716
+		%<a href="https://www.flaticon.com/free-icons/decoration" title="decoration icons">Decoration icons created by Freepik - Flaticon</a>
+		
+	}
+	\frame{
+		\frametitle{Let's move to a CI Pipleline}
+		\begin{mdframed}[tikzsetting={draw=white,fill=white,fill opacity=0.8,
+				line width=0pt},backgroundcolor=none,leftmargin=0,
+			rightmargin=150,innertopmargin=4pt,roundcorner=10pt]
+			\tableofcontents[currentsection,sections={1-5},hideothersubsections]
+		\end{mdframed}
+	}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+   \frametitle{Preparations}
+	All GitHub workflows are stored in a hidden directory \altverb{.github/workflows/}.
+	\begin{task}
+		{Create this directory.}
+	\end{task}
+    \begin{lstlisting}[language=Bash, style=Shell]
+$ mkdir -p .github/workflows/
+    \end{lstlisting}
+    \pause
+    \begin{docs}
+    	{In GitLab all you need is a file \altverb{.gitlab-ci.yml}.}
+    \end{docs}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}<handout:0>
+	\begin{hint}
+		{We are \emph{not} going to code all what follows by hand!}
+	\end{hint}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Introducing the YAML files}
+	Within the workflow directory, you may place yaml files.
+	\begin{docs}
+		{The naming is arbitrary!}
+	\end{docs}
+    First, we baptize our files for purpose, e.\,g. \altverb{CI}, \altverb{release-please}, etc.:
+    \begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+name: CI
+    \end{lstlisting}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{on} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Defines when the workflow should run:
+			\begin{itemize}
+				\item On pushes to the \texttt{main} branch
+				\item On pull requests
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{jobs} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+jobs:
+  formatting:
+    runs-on: ubuntu-latest
+  linting:
+    runs-on: ubuntu-latest
+  testing:
+    runs-on: ubuntu-latest
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Contains all jobs that run in the workflow:
+			\begin{itemize}
+				\item \texttt{formatting} - Code formatting checks
+				\item \texttt{linting} - Code quality checks
+				\item \texttt{testing} - Running tests
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{runs-on} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+jobs:
+  formatting:
+    runs-on: ubuntu-latest
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Specifies the type of machine to run the job on:
+			\begin{itemize}
+				\item \texttt{ubuntu-latest} - Latest Ubuntu runner
+				\item Other options: \texttt{windows-latest}, \texttt{macos-latest}
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{services} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+services:
+  mysql:
+    image: mysql:8.0
+    env:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8888:3306"
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Provides additional services for testing:
+			\begin{itemize}
+				\item Runs MySQL database container
+				\item Sets environment variables
+				\item Maps ports for access
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{steps} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+steps:
+  - name: Check out the code
+    uses: actions/checkout@v4
+  - name: Install poetry
+    run: pip install poetry
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Defines the sequence of tasks to execute:
+			\begin{itemize}
+				\item Each step can use pre-built actions (\texttt{uses})
+				\item Or run shell commands (\texttt{run})
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{uses} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+- name: Check out the code
+  uses: actions/checkout@v4
+- uses: actions/setup-python@v5
+  with:
+    python-version: "3.11"
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			References pre-built GitHub Actions:
+			\begin{itemize}
+				\item \texttt{actions/checkout} - Downloads repository code
+				\item \texttt{actions/setup-python} - Sets up Python environment
+				\item Version pinning with \texttt{@v4}, \texttt{@v5}
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{with} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+- uses: actions/setup-python@v5
+  with:
+    python-version: "3.11"
+    cache: poetry
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Provides input parameters to actions:
+			\begin{itemize}
+				\item \texttt{python-version} - Specifies Python version
+				\item \texttt{cache} - Enables dependency caching
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{The \texttt{run} Property}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{lstlisting}[language=yaml,basicstyle=\small\ttfamily]
+- name: Install poetry
+  run: pip install poetry
+- name: Check formatting
+  run: poetry run black --check .
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			Executes shell commands:
+			\begin{itemize}
+				\item Single commands or multi-line scripts
+				\item Uses the default shell of the runner
+				\item Can include complex command sequences
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{\HandsOn{Dowload and Run}}
+	\begin{task}
+		{Please download the gist \url{https://jgu.to/w0bk}}
+	\end{task}
+    Place it in \altverb{.github/workflows} and
+    \begin{lstlisting}[language=Bash, style=Shell]
+$ git add .github/workflows/ci.yml
+$ git commit -m "your commit message"
+$ git push
+    \end{lstlisting}
+    Then, look on the running actions of your forked project.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Looking at the Details}
+	\begin{task}
+		{Whilst the CI is running (a few minutes), we shall read the pipeline in detail. Ask, what you want to ask!}
+	\end{task}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Correcting our Code}
+	We noticed 3 failed jobs:
+	\begin{itemize}[<+->]
+		\item to correct \altverb{formatting} and \altverb{linting} we need to run
+		      \begin{lstlisting}[language=Bash, style=Shell]
+$ black @.@
+$ #then
+$ git add src/converter.py tests/test_converter.py \
+> scripts/build.py
+$ git commit -m "your commit message"
+$ git push
+		      \end{lstlisting}
+	     \item for the "numerics" remember: $\circ\mathsf{C} = \frac{\circ\mathsf{F} - 32}{1.8}$ - do you find the spot?
+	\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{\HandsOn{Adding a \CC Pipline} }
+	\begin{task}
+		{Please download the gist \url{https://jgu.to/lnkz}}
+	\end{task}
+	Place it in \altverb{.github/workflows} and
+	\begin{lstlisting}[language=Bash, style=Shell]
+$ git add .github/workflows/ci.yml
+$ git commit -m "your commit message"
+$ git push
+	\end{lstlisting}
+	Then, look on the running actions of your forked project.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Looking at the Details}
+	\begin{task}
+		{Whilst the CI is running (a few minutes), we shall read the pipeline in detail. Ask, what you want to ask!}
+	\end{task}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Correcting our Code}
+	Here any number of jobs may fail - the first failing will prevent other runners from starting. We only need to correct the "numerics":
+	
+\end{frame}

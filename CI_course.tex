@@ -1,0 +1,451 @@
+%-------------------------------------------------------%
+%       CPP- Programming Intro                          %
+%-------------------------------------------------------%
+
+
+\documentclass[english,xcolor=pdftex,dvipsnames,aspectratio=169]{beamer} 
+
+\usepackage{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{wrapfig}
+\usepackage{color,colortbl}
+\usepackage{upquote}
+\usepackage{ifthen}
+
+\definecolor{pblue}{RGB}{45,106,148}
+\definecolor{pdarkblue}{RGB}{35,71,100}
+\definecolor{plightblue}{RGB}{90,159,212}
+\definecolor{pyellow}{RGB}{255,212,59}
+\definecolor{pdarkyellow}{RGB}{255,188,41}
+\definecolor{orange}{RGB}{255,165,0}
+\definecolor{plightyellow}{RGB}{255,232,115}
+\definecolor{pdarkgrey}{RGB}{100,100,100}
+\definecolor{pgrey}{RGB}{153,153,153}
+\definecolor{plightgrey}{RGB}{233,233,233}
+\definecolor{plightgrey2}{RGB}{247,247,247}
+\definecolor{pnavy}{RGB}{0,0,170}
+\definecolor{BrickRed}{RGB}{150,22,11}
+\definecolor{BlueViolet}{RGB}{138, 43, 226}
+\definecolor{PineGreen}{RGB}{0, 51, 0}
+\definecolor{light-gray}{gray}{0.95}
+
+\definecolor{UniRot}{RGB}{193,0,42}
+\definecolor{UniDunkelGrau}{RGB}{99,99,99}
+\definecolor{UniHellGrau}{RGB}{172,172,172}
+
+\definecolor{UrlColor}{rgb}{0,0.08,0.45}
+\definecolor{tcA}{rgb}{0.627451,0.627451,0.643137}
+
+
+\usetheme{CambridgeUS} % Pittsburgh, CambridgeUS
+\usecolortheme{beaver} %wolverine | crane | beaver | seahorse
+\useinnertheme{rounded} 
+\useoutertheme{default}
+\usefonttheme{default}
+%\setbeamercovered{transparent}
+\setbeamertemplate{footline}[frame number]
+\setbeamersize{text margin left=0.5cm, text margin right=0.5cm}
+
+\setbeamercolor{structure}{fg=UniRot}% to modify  immediately all palettes
+\setbeamercolor{title}{fg=UniRot}
+\setbeamercolor{title in head/foot}{fg=UniRot}
+\setbeamercolor{block title}{fg=white,bg=orange}
+\setbeamercolor{block title alerted}{fg=white,bg=UniRot}
+\setbeamercolor{block title example}{fg=white,bg=PineGreen!80}
+
+
+% enables two line cols in tabular envs
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,snakes,backgrounds,positioning,shadows,decorations,trees}
+
+\usepackage{smartdiagram}
+\usesmartdiagramlibrary{additions}
+\usepackage{tikzpeople}
+
+\addtobeamertemplate{footline}{}{%
+\begin{tikzpicture}[remember picture,overlay]
+\node[anchor=south west,yshift=2pt] at (current page.south west) {\includegraphics[height=0.8cm]{images/logos/nhr_sw3_k50.png} \includegraphics[height=0.8cm]{images/logos/DRA_LogoNoText.png}};
+\end{tikzpicture}}
+
+\usepackage[tikz]{bclogo}
+\newcommand{\task}[2][Over to you]{\begin{bclogo}[arrondi=0.1,logo=\bcoutil]{#1} #2 \end{bclogo}}
+\newcommand{\docs}[2][Documentation]{\begin{bclogo}[arrondi=0.1,logo=\bcbook]{#1} #2 \end{bclogo}}
+\newcommand{\hint}[2][Hint]{\begin{bclogo}[arrondi=0.1,logo=\bcinfo]{#1} #2 \end{bclogo}}
+\newcommand{\warning}[2][Warning]{\begin{bclogo}[arrondi=0.1,logo=\bcattention]{#1} #2 \end{bclogo}}
+% ``d/Definition'' is already defined ;-)
+\newcommand{\explanation}[2][Definition]{\begin{bclogo}[arrondi=0.1,logo=\bcplume]{#1} #2 \end{bclogo}}
+\newcommand{\question}[2][Question]{\begin{bclogo}[arrondi=0.1,logo=\bcquestion]{#1} #2 \end{bclogo}}
+
+\usepackage{marvosym}
+\usepackage[load-configurations=binary,binary-units=true]{siunitx}
+\usepackage{todonotes}
+\usepackage{multicol}
+
+\usepackage{hhline}
+\usepackage[labelformat=empty]{caption}
+
+\usepackage{times}
+
+\usepackage{dirtree,float} % for directory tree listings
+\usepackage[nodisplayskipstretch]{setspace}
+
+% will decrease the font size for one frame
+\newcommand\Fontvi{\fontsize{6}{7.2}\selectfont}
+
+\usepackage{verbatim}
+\usepackage{fancyvrb,cprotect} % to enable # in verbatim mode
+\usepackage{listings}
+
+\newcommand\YAMLcolonstyle{\color{red}\bfseries}
+\newcommand\YAMLkeystyle{\color{black}\bfseries}
+\newcommand\YAMLvaluestyle{\color{blue}\mdseries}
+\newcommand\YAMLemphasisstyle{\color{red}\bfseries}
+
+\makeatletter
+\newcommand\language@yaml{yaml}
+\expandafter\expandafter\expandafter\lstdefinelanguage
+\expandafter{\language@yaml}
+{
+	keywords={true,false,null,y,n},
+	keywordstyle=\color{darkgray}\bfseries,
+	basicstyle=\YAMLkeystyle,
+	sensitive=false,
+	comment=[l]{\#},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{purple}\ttfamily,
+	stringstyle=\YAMLvaluestyle\ttfamily,
+	moredelim=[l][\color{orange}]{\&},
+	moredelim=[l][\color{magenta}]{*},
+	moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:},
+	morestring=[b]',
+	morestring=[b]",
+	literate=
+	{---}{{\ProcessThreeDashes}}3
+	{>}{{\textcolor{red}\textgreater}}1     
+	{|}{{\textcolor{red}\textbar}}1 
+	{\ -\ }{{\mdseries\ -\ }}3
+	{@}{{\makeatletter @ \makeatother}}1
+	{!}{{\YAMLemphasisstyle}}1,
+	keepspaces=true,
+	escapechar=\%,
+	alsoletter={ },
+	extendedchars=false,
+	breaklines=true,
+	breakatwhitespace=true,
+	breakindent=0pt,
+	postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookrightarrow\space}},
+	linewidth=\textwidth,
+}
+\makeatother
+
+\newcommand\ProcessThreeDashes{\llap{\color{cyan}\mdseries-{-}-}}
+
+\lstloadlanguages{              %
+  % Python,                       %
+   bash,                         %
+  C++,
+  yaml                           %
+}
+
+% Listing for Shell
+\lstdefinestyle{Shell}
+{
+  language=Bash,
+  basicstyle=\ttfamily\small,
+  showstringspaces=false,
+  % frame=single,
+  % framerule=0.4pt,
+  rulecolor=\color{pgrey},
+  backgroundcolor=\color{plightgrey2},
+  stringstyle=\color{BrickRed},
+  keywordstyle=\color{BlueViolet},
+  commentstyle=\color{PineGreen}\bfseries,
+  identifierstyle=\color{black},
+  emph={[10]\$,>>>}, emphstyle={[10]\color{pblue}},
+  moredelim=**[is][\bfseries\color{red}]{@}{@}
+}
+
+
+% Listing for C++
+\lstdefinestyle{C++}
+{                               %
+  language=C++,                 %
+  basicstyle=\scriptsize,       %
+  showstringspaces=false,       %
+  stepnumber=5,                 %
+  numberstyle=\tiny,            %
+  numbersep=5pt,                %
+  showspaces=false,             
+  % frame=single,                 
+  % framerule=0.2pt,              
+  rulecolor=\color{pgrey},      
+  backgroundcolor=\color{plightgrey2}, 
+  stringstyle=\color{magenta},        
+  keywordstyle=\color{blue},           
+  commentstyle=\color{PineGreen}\bfseries, 
+  identifierstyle={},                      
+  emph={[10]this}, emphstyle={[10]\color{pblue}}, 
+  emph={[11]auto}, emphstyle={[11]\color{pblue}},
+  morekeywords={type},
+  moredelim=[is][\bfseries\color{red}]{@}{@}     
+}
+
+%default shell listings:
+\lstdefinestyle{Shell}
+{
+	language=Bash,
+	basicstyle=\ttfamily\small,
+	showstringspaces=false,
+	frame=single,
+	framerule=0.4pt,
+	rulecolor=\color{pgrey},
+	backgroundcolor=\color{plightgrey2},
+	stringstyle=\color{BrickRed},
+	keywordstyle=\color{BlueViolet},
+	commentstyle=\color{PineGreen}\bfseries,
+	identifierstyle=\color{black},
+	emph={[10]\$,>>>}, emphstyle={[10]\color{pblue}},
+	moredelim=**[is][\bfseries\color{red}]{@}{@},
+	literate={\\@}{{\makeatletter @ \makeatother}}1
+}
+
+\makeatletter
+\newcommand\applyCurrentFontsize
+{%
+	% we first save the current fontsize, baseline-skip,
+	% and listings' basicstyle
+	\let\f@sizeS@ved\f@size%
+	\let\f@baselineskipS@ved\f@baselineskip%
+	\let\basicstyleS@ved\lst@basicstyle%
+	% we now change the fontsize of listings' basicstyle
+	\renewcommand\lst@basicstyle%
+	{%
+		\basicstyleS@ved%
+		\fontsize{\f@sizeS@ved}{\f@baselineskipS@ved}%
+		\selectfont%
+	}%
+}
+\makeatother
+
+\newcommand{\altverb}[2][{}]{\colorbox{plightgrey}{\applyCurrentFontsize \lstinline[language={#1}]{#2}}}
+
+\newcommand{\CC}{C\nolinebreak\hspace{-0.05em}\raisebox{0.1em}{++}}
+
+\newcommand{\bibtex}{\textsc{Bib}\TeX}
+
+
+%%% https://tex.stackexchange.com/questions/99316/symbol-for-external-links
+\newcommand{\LinkSymbol}{%
+  \tikz[x=1.2ex, y=1.2ex, baseline=-0.05ex]{% 
+    \begin{scope}[x=1ex, y=1ex]
+      \clip (-0.1,-0.1) 
+      --++ (-0, 1.2) 
+      --++ (0.6, 0) 
+      --++ (0, -0.6) 
+      --++ (0.6, 0) 
+      --++ (0, -1);
+      \path[draw, 
+      line width = 0.5, 
+      rounded corners=0.5] 
+      (0,0) rectangle (1,1);
+    \end{scope}
+    \path[draw, line width = 0.5] (0.5, 0.5) 
+    -- (1, 1);
+    \path[draw, line width = 0.5] (0.6, 1) 
+    -- (1, 1) -- (1, 0.6);
+  }
+}
+\usepackage{nameref}
+\newcommand{\lhref}[2]{\href{#1}{#2\,\LinkSymbol}}
+
+\setbeamertemplate{section page}
+{
+    \begin{centering}
+    \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+    \end{centering}
+}
+
+
+\newcounter{handson}
+\setcounter{handson}{1}
+\newcounter{preframe_handson}
+\setcounter{preframe_handson}{1}
+\newcommand{\HandsOn}[1]{Hands On \Roman{handson} -- #1 \addtocounter{handson}{1}}
+
+\newcounter{interlude}
+\setcounter{interlude}{1}
+\newcounter{preframe_interlude}
+\setcounter{preframe_interlude}{1}
+\newcommand{\Interlude}[1]{Interlude \Roman{interlude} -- #1 \addtocounter{interlude}{1}}
+
+\newcounter{advertisements}
+\setcounter{advertisements}{1}
+\newcounter{preframe_advertisements}
+\setcounter{preframe_advertisements}{1}
+\newcommand{\Advertisement}[1]{Advertisement \Roman{advertisements} -- #1 \addtocounter{advertisements}{1}}
+
+%%%% shortcuts for uniform appearance of common strings %%%%
+\newcommand{\slurm}{\textsc{slurm}~}
+\makeatletter
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+\usepackage{xspace}
+\newcommand{\mogon}{\textsc{mogon}\xspace}
+\newcommand{\mogonI}{\textsc{mogon}\,\Rmnum{1}\xspace}
+\newcommand{\mogonII}{\textsc{mogon}\,\Rmnum{2}\xspace}
+
+\setcounter{tocdepth}{1}
+
+%--------------------%
+% Meta-Info 
+%--------------------%
+
+\title[CI Course]{Continuous Integration} 
+\subtitle{An Introduction}
+\author[DRA]{Christian Meesters - DRA}
+\institute{\includegraphics[width=4cm]{images/logos/nhr_sw3_k50.png}\includegraphics[width=2cm]{images/logos/DRA_LogoNoText.png}}
+\date{\newline{\scriptsize Edition 1} -- \scriptsize 9.10.2025}
+%\titlegraphic{\includegraphics[width=1.5cm,height=1.5cm]{Logo_klein}}
+
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+
+\graphicspath{{images/}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+% For every picture that defines or uses external nodes, you'll have to
+% apply the 'remember picture' style. To avoid some typing, we'll apply
+% the style to all pictures.
+\tikzstyle{every picture}+=[remember picture]
+\tikzstyle{na} = [baseline=-.5ex]
+\tikzstyle{ind} = [rectangle,   %
+% drop shadow,                    %
+draw=black, %thick,
+rounded corners,                %
+minimum width=0.5cm,            %
+minimum height=0.4cm]
+
+\tikzstyle{host} = [rectangle,  %
+% drop shadow,                    %
+draw=black, %thick,
+rounded corners,                %
+minimum width=7.8cm,            %
+minimum height=1.1cm]
+
+
+
+%%%% nicer typesetting the snakemake project
+\newcommand{\Snakemake}{\mbox{
+		\begingroup\normalfont
+		\includegraphics[height=1em]{logos/Snakemake.png}
+		\textbf{Snakemake}
+		\endgroup}}
+
+% Passe captions an
+\setbeamertemplate{caption}{\insertcaption}
+\setbeamerfont{caption}{size=\footnotesize}
+\setlength\abovecaptionskip{0pt}
+\setlength\belowcaptionskip{0pt}
+
+% Passe das Inhaltsverzeichnis an
+\setbeamertemplate{section in toc}[square]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Gebe den aktuellen Pfad zu den Aufgaben und den Loesungen an !
+% \newcommand{\pathtoexercise}[1]{\path{/project/hpckurs/cpp-intro/samples/#1}}
+% \newcommand{\pathtosolution}[1]{\path{/project/hpckurs/cpp-intro/solutions/#1}}
+% \newcommand{\pathtoexample}[1]{\path{/project/hpckurs/cpp-intro/examples/#1}}
+\newcommand{\pathtoexercise}[1]{\path{code/samples/#1}}
+\newcommand{\pathtosolution}[1]{\path{code/solutions/#1}}
+\newcommand{\pathtoexample}[1]{\path{code/examples/#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Und dies sind die Pfade zu den Bilder und Logos
+
+%\newcommand{\pathtoimages}[1]{\path{../images/#1}}
+\newcommand{\pathtologos}[1]{\path{../logos/#1}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[plain] % plain erzeugt Titelseite ohne Kopf- und Fußzeile
+  \titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\begin{frame}
+  \frametitle{Outline}
+  \begin{columns}[t]
+    \begin{column}{.5\textwidth}
+      \tableofcontents[sections={1-8}]
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \tableofcontents[sections={9-16}]
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\include{00_About_Me}
+\include{01_About_CI}
+\include{02_Our_Task}
+\include{03_CI}
+\include{04_Releases}
+\include{appendix}
+
+
+
+
+
+% \begin{frame}
+%   \frametitle{List for possible further topics to cover}
+%   \begin{itemize}
+%   \item Something about data structures, e.g. a linked list, a tree, or something along
+%     these lines
+%   \item What is a good design? The Müller-script provides a really nice example!
+%   \item Schlussthema: Some hints on programming -> file: XX\_hints.tex:
+%     \begin{itemize}
+%     \item Correctness first
+%     \item Optimization second: quote from Donald Knuth
+%     \item Some obvious optimizations: use constants or constexpr, loop unrolling, pure functions, load data continuously,\ldots
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+
+
+
+
+
+
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\begin{frame}<handout:0> 
+  \frametitle{The End}
+ \begin{center}
+   \begin{figure}
+     \centering
+     \includegraphics[width=0.7\textwidth]{the_end.jpg}
+   \end{figure}
+   Thank you for your attention! \newline Please give us some feedback!
+ \end{center}
+\end{frame}
+
+\end{document}
