@@ -12,8 +12,347 @@
 		\begin{mdframed}[tikzsetting={draw=white,fill=white,fill opacity=0.8,
 				line width=0pt},backgroundcolor=none,leftmargin=0,
 			rightmargin=150,innertopmargin=4pt,roundcorner=10pt]
-			\tableofcontents[currentsection,sections={1-5},hideothersubsections]
+			\tableofcontents[currentsection,sections={1-6},hideothersubsections]
 		\end{mdframed}
 	}
 }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{The Road to Automated Releases}
+	Before we can automate releases, we need:
+	\begin{itemize}[<+->]
+		\item \textbf{Structured commit messages} - to understand what changed
+		\item \textbf{Automated changelog generation} - to document changes		
+		\item \textbf{Semantic versioning} - to version releases appropriately
+		\item \textbf{Quality gates} - to ensure only good code gets released
+	\end{itemize}
+	\pause
+	\begin{block}{The Foundation}
+		{All of this starts with \emph{conventional commits} - a standardized way of writing commit messages.}
+	\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Conventional Commits}
+	\begin{block}{What are Conventional Commits?}
+		{A specification for adding human and machine readable meaning to commit messages.}
+	\end{block}
+	\pause
+	\begin{itemize}
+		\item Defined at \url{https://www.conventionalcommits.org/}
+		\item Provides a consistent format for commit messages
+		\item Enables automated tooling (changelogs, version bumps, releases)
+		\item Improves project history readability
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Conventional Commit Format}
+	The basic structure:
+	\begin{lstlisting}[language=bash, style=Shell]
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+	\end{lstlisting}
+	\pause
+	\textbf{Common types:}
+	\begin{itemize}
+		\item \texttt{feat}: A new feature
+		\item \texttt{fix}: A bug fix  
+		\item \texttt{docs}: Documentation only changes
+		\item \texttt{style}: Code style changes (formatting, etc.)
+		\item \texttt{refactor}: Code changes that neither fix bugs nor add features
+		\item \texttt{test}: Adding or correcting tests
+		\item \texttt{chore}: Changes to build process, dependencies, etc.
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Conventional Commit Examples}
+	Good commit messages following the convention - starting with \altverb{git commit -m}:
+	\begin{lstlisting}[language=bash, style=Shell]
+feat(converter): add celsius to fahrenheit conversion
+
+fix: correct temperature conversion formula
+
+docs: update README with installation instructions
+
+feat!: new suport for bessel functions
+
+chore(deps): bump pytest from 7.1.0 to 7.2.0
+	\end{lstlisting}
+	\pause
+	\begin{block}{Breaking Changes}
+		{Use \texttt{!} after the type/scope or \texttt{BREAKING CHANGE:} in footer for breaking changes.}
+	\end{block}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Why Enforce Conventional Commits?}
+	\begin{itemize}[<+->]
+		\item \textbf{Consistency} - All team members follow the same format
+		\item \textbf{Automation} - Tools can parse commits to:
+		\begin{itemize}
+			\item Generate changelogs automatically
+			\item Determine semantic version bumps
+			\item Create releases
+		\end{itemize}
+
+		\item \textbf{Better History} - Easy to understand what each commit does
+
+		\item \textbf{Quality Gates} - Can reject non-conforming commits/PRs
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Enforcing Conventional Commits in PRs}
+	{\footnotesize We can validate PR titles using GitHub Actions:}
+	\begin{lstlisting}[language=yaml, style=Shell,basicstyle=\small\ttfamily,escapeinside={(*}{*)}]
+name: PR
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+
+jobs:
+  title-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request(*@*)v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+	\end{lstlisting}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Understanding GitHub Tokens}
+	\begin{warning}[GitHub Token Required]
+		{The action needs \texttt{GITHUB\_TOKEN} to interact with the repository.}
+	\end{warning}
+	\pause
+	\textbf{What is GITHUB\_TOKEN?}
+	\begin{itemize}
+		\item An authentication token provided automatically by GitHub
+		\item Available in \texttt{\$\{\{ secrets.GITHUB\_TOKEN \}\}}
+		\item Has permissions to read/write repository data
+		\item Automatically created for each workflow run
+	\end{itemize}
+	\pause
+	\begin{docs}
+		{You don't need to create this token - GitHub provides it automatically!}
+	\end{docs}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{GitHub Token Permissions}
+	\textbf{Default permissions include:}
+	\begin{itemize}
+		\item Read repository contents
+		\item Write to issues and pull requests
+		\item Create and update check runs
+		\item Read repository metadata
+	\end{itemize}
+	\pause
+	\begin{hint}
+		{For security, modern repositories often use restricted token permissions. You may need to adjust them in repository settings.}
+	\end{hint}
+	\pause
+	\textbf{Where to adjust:} Repository Settings → Actions → General → Workflow permissions
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{frame}[fragile]
+% 	\frametitle{\HandsOn{Creating the PR Validation Action}}
+% 	\begin{task}
+% 		{Create a file \texttt{.github/workflows/conventional-prs.yml}}
+% 	\end{task}
+% 	\begin{lstlisting}[language=yaml, style=Shell]
+% name: PR
+% on:
+%   pull_request_target:
+%     types:
+%       - opened
+%       - reopened  
+%       - edited
+%       - synchronize
+% 
+% jobs:
+%   title-format:
+%     runs-on: ubuntu-latest
+%     steps:
+%       - uses: amannn/action-semantic-pull-request@v5
+%         env:
+%           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+% 	\end{lstlisting}
+% \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Conventional Commits in Practice}
+	\begin{block}{Time Constraints}
+		{Due to time limitations, we won't implement PR validation in this workshop.}
+	\end{block}
+	\pause
+	\begin{docs}
+		{Let's look at a real-world example instead!}
+	\end{docs}
+	\pause
+	\textbf{The Snakemake Repository:}
+	\begin{itemize}
+		\item Visit \url{https://github.com/snakemake/snakemake}
+		\item Look at recent commits and pull requests
+		\item Notice how commit messages follow conventional format
+		\item See how PR titles are structured
+		\item Observe the automated changelog generation
+	\end{itemize}
+	\pause
+	\begin{hint}
+		{This gives you a great template for your own projects!}
+	\end{hint}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Automated Releases with Release Please}
+	\begin{block}{What is Release Please?}
+		{A GitHub Action that automates releases by parsing conventional commits.}
+	\end{block}
+	\pause
+	\textbf{What it does:}
+	\begin{itemize}
+		\item Parses commit messages since last release
+		\item Determines appropriate version bump (major/minor/patch)
+		\item Generates changelog from commit messages
+		\item Creates release PRs with version updates
+		\item Creates GitHub releases when PRs are merged
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Semantic Versioning with Release Please}
+	Based on conventional commits, release-please determines version bumps:
+	\begin{itemize}[<+->]
+		\item \texttt{fix:} commits → \textbf{PATCH} version (1.0.0 → 1.0.1)
+		\item \texttt{feat:} commits → \textbf{MINOR} version (1.0.0 → 1.1.0)
+		\item \texttt{feat!:} or \texttt{BREAKING CHANGE:} → \textbf{MAJOR} version (1.0.0 → 2.0.0)
+		\item \texttt{docs:}, \texttt{style:}, \texttt{refactor:}, \texttt{test:}, \texttt{chore:} → No version bump
+	\end{itemize}
+	\begin{docs}
+		{Follows semantic versioning specification: \url{https://semver.org/}}
+	\end{docs}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Publishing to PyPI}
+	\begin{block}{PyPI Token Required}
+		{To publish Python packages to PyPI, you need an API token.}
+	\end{block}
+	\pause
+	\textbf{How to get a PyPI token:}
+	\begin{enumerate}
+		\item Create account at \url{https://pypi.org/}
+		\item Go to Account Settings → API tokens
+		\item Click "Add API token"
+		\item Choose scope (project-specific recommended)
+		\item Copy the generated token (starts with \texttt{pypi-})
+	\end{enumerate}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Storing PyPI Token in GitHub}
+	\begin{warning}[Never Commit Secrets!]
+		{API tokens should never be committed to your repository.}
+	\end{warning}
+	\pause
+	\textbf{Store in GitHub Secrets:}
+	\begin{enumerate}
+		\item Go to repository Settings → Secrets and variables → Actions
+		\item Click "New repository secret"
+		\item Name: \texttt{PYPI\_API\_TOKEN}
+		\item Value: Your PyPI token (including \texttt{pypi-} prefix)
+		\item Click "Add secret"
+	\end{enumerate}
+	\pause
+	\begin{docs}
+		{Access in workflows using \texttt{\$\{\{ secrets.PYPI\_API\_TOKEN \}\}}}
+	\end{docs}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Release Please Action Example}
+	Basic release-please workflow:
+	\begin{lstlisting}[language=yaml, style=Shell,basicstyle=\small\ttfamily,escapeinside={(*}{*)}]
+name: Release Please
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action(*@*)v3
+        with:
+          release-type: python
+          package-name: my-package
+          token: ${{ secrets.GITHUB_TOKEN }}
+	\end{lstlisting}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Release Please Workflow}
+	\textbf{How it works:}
+	\begin{enumerate}[<+->]
+		\item Developer makes commits following conventional format
+		\item On push to main, release-please analyzes commits
+		\item If releasable changes found, creates/updates a release PR
+		\item Release PR contains:
+		\begin{itemize}
+			\item Updated version numbers
+			\item Generated changelog
+			\item Any other release preparation
+		\end{itemize}
+		\item When release PR is merged, creates GitHub release
+		\item Additional actions can publish to PyPI, Docker Hub, etc.
+	\end{enumerate}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Why No Releases in This Workshop?}
+	\begin{block}{Workshop Limitations}
+		{We won't create actual releases during this workshop.}
+	\end{block}
+	\pause
+	\textbf{Reasons:}
+	\begin{itemize}
+		\item Our code examples are \textbf{toy projects} - not production software
+		\item No real users would benefit from versioned releases
+		\item We are missing proper documentation and packaging setup
+		\item Time constraints for full release pipeline setup
+	\end{itemize}
+	\pause
+	\begin{hint}
+		{Use the concepts learned here when you work on actual software projects!}
+	\end{hint}
+\end{frame}
 

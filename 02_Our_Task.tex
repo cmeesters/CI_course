@@ -12,7 +12,7 @@
 		\begin{mdframed}[tikzsetting={draw=white,fill=white,fill opacity=0.8,
 				line width=0pt},backgroundcolor=none,leftmargin=0,
 			rightmargin=150,innertopmargin=4pt,roundcorner=10pt]
-			\tableofcontents[currentsection,sections={1-5},hideothersubsections]
+			\tableofcontents[currentsection,sections={1-6},hideothersubsections]
 		\end{mdframed}
 	}
 }
@@ -52,31 +52,42 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
-	\frametitle{\HandsOn{Pulling a Repository}}
+	\frametitle{\HandsOn{Cloning a Repository}}
 	So, you just forked a repo as your "own" fork. This is how you get it locally.
 	\begin{lstlisting}[language=Bash, style=Shell,escapeinside={(*}{*)}]
 $ git clone git(*@*)github.com:<username>/ci-exercises
 	\end{lstlisting}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+    		\centering
+    		\begin{minipage}[t]{0.8\textwidth}
+    			\setstretch{0.1}
+    			{\tiny \DTsetlength{0.2em}{1em}{0.2em}{0.4pt}{.6pt}
+    				\dirtree{%
+    					.1 {CMakeLists.txt}.
+    					.1 {pyproject.toml}.
+    					.1 {environment.yaml}.
+    					.1 {src}.
+    					.2 {converter.py}.
+    					.2 {\ldots}.
+    					.2 {pi\_estimator.cpp}.
+    					.2 {tests}.
+    					.3 {test\_converter.py}.
+    					.3 {test\_pi\_estimator.cpp}.
+    			}}
+    		\end{minipage}
+    	\end{column}
+        \begin{column}{0.5\textwidth}
+        	\begin{hint}
+        		{From no on, we assume that you are working in the \altverb{ci-exercises} directory.}
+        	\end{hint}
+        \end{column}
+    \end{columns}
     Afterwards your repo should look like (plus some files):
+   
 
-\centering
-\begin{minipage}[t]{0.8\textwidth}
-	\setstretch{0.1}
-	{\tiny \DTsetlength{0.2em}{1em}{0.2em}{0.4pt}{.6pt}
-		\dirtree{%
-			.1 {CMakeLists.txt}.
-			.1 {pyproject.toml}.
-			.1 {environment.yaml}.
-			.1 {src}.
-			.2 {converter.py}.
-			.2 {\ldots}.
-			.2 {pi\_estimator.cpp}.
-			.2 {tests}.
-			.3 {test\_converter.py}.
-			.3 {test\_pi\_estimator.cpp}.
-	}}
-\end{minipage}
 \end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}<handout:0>[fragile]

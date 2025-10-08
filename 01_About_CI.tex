@@ -12,7 +12,7 @@
 		\begin{mdframed}[tikzsetting={draw=white,fill=white,fill opacity=0.8,
 				line width=0pt},backgroundcolor=none,leftmargin=0,
 			rightmargin=150,innertopmargin=4pt,roundcorner=10pt]
-			\tableofcontents[currentsection,sections={1-5},hideothersubsections]
+			\tableofcontents[currentsection,sections={1-6},hideothersubsections]
 		\end{mdframed}
 	}
 }
@@ -101,6 +101,7 @@
 
 			\begin{itemize}[<+->]
 			  \item Linting (Static Code Analysis)
+			  \item for compiled languages: debug and release runs with difference compilers and settings, possibly checks for memory leaks.
 			  \item Formatting (sometimes disliked)
 			  \item Posting on Social Media
 			\end{itemize}
@@ -118,10 +119,12 @@
 			\only<2>{\includegraphics[width=0.8\textwidth]{Islands_connected.jpg}}
 		\end{column}
 		\begin{column}{0.6\textwidth}
+			After cvs, svn, mecurial, etc. the RSE world settled for git -- close to 100 \% -- for source code management. Regarding CI, we have:
+			\pause
 			\begin{itemize}
 				\item There is GitHub.com - the big beautiful island big enough for all, with all its cornucopia of features.
 				\item Our institutions set on GitLab. Isolated. Good enough for interal projects.
-				\only<2>{\item Perhaps, once ActivityPub is established for GitLab and Codeberg (Forgejo), we find ourselves in a different situation.}
+				\only<3>{\item Perhaps, once ActivityPub is established for GitLab and Codeberg (Forgejo), we find ourselves in a different situation.}
 			\end{itemize}
 		\end{column}
 	\end{columns}
