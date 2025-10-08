@@ -1,0 +1,185 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{GitLab vs GitHub CI}
+{   
+	\usebackgroundtemplate{
+		\vbox to \paperheight{\vfil\hbox to \paperwidth{\hfil\includegraphics[height=\paperheight]{pipe.png}\hfil}\vfil}
+		%https://www.flaticon.com/free-icon/decoration_2788716
+		%<a href="https://www.flaticon.com/free-icons/decoration" title="decoration icons">Decoration icons created by Freepik - Flaticon</a>
+		
+	}
+	\frame{
+		\frametitle{CI Platforms Comparison}
+		\begin{mdframed}[tikzsetting={draw=white,fill=white,fill opacity=0.8,
+				line width=0pt},backgroundcolor=none,leftmargin=0,
+			rightmargin=150,innertopmargin=4pt,roundcorner=10pt]
+			\tableofcontents[currentsection,sections={1-6},hideothersubsections]
+		\end{mdframed}
+	}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Configuration Files}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{GitHub Actions}
+			\begin{itemize}
+				\item \texttt{.github/workflows/*.yml}
+				\item Multiple workflow files
+				\item Each file = one workflow
+			\end{itemize}
+			\begin{lstlisting}[language=yaml, style=Shell]
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps: [...]
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\textbf{GitLab CI}
+			\begin{itemize}
+				\item Single \texttt{.gitlab-ci.yml}
+				\item All jobs in one file
+				\item Stages organize jobs
+			\end{itemize}
+			\begin{lstlisting}[language=yaml, style=Shell]
+stages:
+  - test
+  - deploy
+
+test-job:
+  stage: test
+  script: [...]
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+	\frametitle{Key Differences}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{GitHub Actions}
+			\begin{itemize}
+				\item \textbf{Runners:} GitHub-hosted or self-hosted
+				\item \textbf{Marketplace:} Extensive action ecosystem
+				\item \textbf{Triggers:} Rich event system
+				\item \textbf{Matrix builds:} Built-in support
+				\item \textbf{Secrets:} Repository/organization level
+			\end{itemize}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\textbf{GitLab CI}
+			\begin{itemize}
+				\item \textbf{Runners:} Shared, group, or project runners
+				\item \textbf{Images:} Docker-centric approach
+				\item \textbf{Triggers:} Branch/tag based mainly
+				\item \textbf{Parallel jobs:} Manual configuration
+				\item \textbf{Variables:} Project/group/instance level
+			\end{itemize}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{Syntax Comparison: Python Testing}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\textbf{GitHub Actions}
+			\begin{lstlisting}[language=yaml, style=Shell]
+name: Test
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.8, 3.9, 3.10]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -r requirements.txt
+      - run: pytest
+			\end{lstlisting}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\textbf{GitLab CI}
+			\begin{lstlisting}[language=yaml, style=Shell]
+stages:
+  - test
+
+test:
+  stage: test
+  image: python:3.10
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.8", "3.9", "3.10"]
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - pytest
+			\end{lstlisting}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{GitLab Runner on HPC Systems}
+	\begin{block}{Why HPC Runners?}
+		{HPC systems provide powerful compute resources for CI/CD pipelines.}
+	\end{block}
+	\pause
+	\textbf{Setup Overview:}
+	\begin{enumerate}
+		\item Install GitLab Runner on login/head node
+		\item Configure runner to submit jobs to scheduler (SLURM/LSF)
+		\item Set up custom executor or shell executor
+		\item Configure resource limits and queues
+	\end{enumerate}
+	\pause
+	\begin{lstlisting}[language=bash, style=Shell]
+# Install GitLab Runner
+curl -L --output /usr/local/bin/gitlab-runner \
+  https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+chmod +x /usr/local/bin/gitlab-runner
+
+# Register runner with custom executor
+gitlab-runner register --executor custom
+	\end{lstlisting}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+	\frametitle{HPC Runner Configuration}
+	\textbf{Key considerations:}
+	\begin{itemize}
+		\item \textbf{Scheduler Integration:} Use \texttt{sbatch}/\texttt{qsub} in scripts
+		\item \textbf{Resource Requests:} Configure CPU, memory, time limits
+		\item \textbf{Queue Selection:} Route jobs to appropriate partitions
+		\item \textbf{Environment:} Load modules, set paths in job scripts
+	\end{itemize}
+	\pause
+	\textbf{Example SLURM integration:}
+	\begin{lstlisting}[language=yaml, style=Shell]
+test-hpc:
+  stage: test
+  tags: [hpc-runner]
+  script:
+    - |
+      sbatch --wait --job-name=mpi-ci-test \
+             --nodes=2 --ntasks-per-node=128 --time=30:00 \
+             --wrap="module load mpi/openmpi && mpirun ./my_mpi_program"
+	\end{lstlisting}
+	\pause
+	\begin{warning}[Resource Management]
+		{Always set appropriate resource limits to avoid monopolizing HPC resources!}
+	\end{warning}
+\end{frame}
+
